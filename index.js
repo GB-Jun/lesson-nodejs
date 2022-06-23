@@ -11,6 +11,10 @@ app.get("/", (req, res) => {
     res.render("main", { name: "001" });
 });
 
+app.post("/post", (req, res) => {
+    res.end(`<h2>Post here</h2>`);
+});
+
 app.use((req, res) => {
     res.send(`<h2>404 - Not Found 找不到頁面</h2>
     <img src="/imgs/404-error-page01.jpg" alt=""/>`);
