@@ -6,6 +6,10 @@ app.get("/", (req, res) => {
     res.send(`<h2>安安</h2>`);
 });
 
+app.use((req, res) => {
+    res.send(`<h2>404 - Not Found 找不到頁面</h2>`);
+});
+
 app.listen(process.env.EXPRESS_PORT, () => {
     console.log(
         `Server started at http://localhost:${process.env.EXPRESS_PORT}`
