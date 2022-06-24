@@ -27,6 +27,17 @@ app.post("/post", (req, res) => {
     res.end(`<h2>Post here</h2>`);
 });
 
+// app.route可以先設定路徑, 之後再分別設定方法
+app.route("/try-post-form")
+    .get((req, res) => {
+        res.render("try-post-form");
+    })
+    .post((req, res) => {
+        // 從用戶寄來的資料裡的body拿email, password展開設定, 然後在render時放回資料
+        const { email, password } = req.body;
+        res.render("try-post-form", { email, password });
+    });
+
 // ----------- static folder ------------
 app.use(express.static("public"));
 app.use("/bootstrap", express.static("node_modules/bootstrap/dist"));
