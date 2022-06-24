@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const multer = require("multer");
+const upload = multer({ dest: "tmp-uploads" });
 
 app.set("view engine", "ejs");
 
@@ -37,6 +39,11 @@ app.route("/try-post-form")
         const { email, password } = req.body;
         res.render("try-post-form", { email, password });
     });
+
+// single:單一檔案, array:一個input多個檔案, fields: 多個input多個檔案, none:不上傳檔案
+app.post("/post-uploaded", upload.single("avator"), (req, res) => {
+    res.json(req.file);
+});
 
 // ----------- static folder ------------
 app.use(express.static("public"));
