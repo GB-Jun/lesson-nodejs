@@ -4,20 +4,27 @@ const app = express();
 
 app.set("view engine", "ejs");
 
+
+// ---------- route ---------------
+app.get("/", (req, res) => {
+    res.render("main", { name: "001" });
+});
+
 app.get("/try-qs", (req, res) => {
     res.json(req.query);
 });
 
-app.get("/", (req, res) => {
-    res.render("main", { name: "001" });
+// middleware 中介軟體(function), 他有順序,在使用時如果要多個要用array
+const bodyParser = express.urlencoded({ extended: false });
+app.post("/try-post", bodyParser, (req, res) => {
+    res.json(req.body);
 });
 
 app.post("/post", (req, res) => {
     res.end(`<h2>Post here</h2>`);
 });
 
-
-// ----------- static ------------
+// ----------- static folder ------------
 app.use(express.static("public"));
 app.use("/bootstrap", express.static("node_modules/bootstrap/dist"));
 
