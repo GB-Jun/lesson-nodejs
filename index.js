@@ -4,6 +4,9 @@ const app = express();
 
 app.set("view engine", "ejs");
 
+// ---------- Top-level middleware -----------
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 // ---------- route ---------------
 app.get("/", (req, res) => {
