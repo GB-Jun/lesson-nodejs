@@ -46,6 +46,10 @@ app.post("/post-uploaded", upload.single("avator"), (req, res) => {
     res.json(req.file);
 });
 
+app.post("/post-uploadeds", upload.array("photos"), (req, res) => {
+    res.json(req.files);
+});
+
 // ----------- static folder ------------
 app.use(express.static("public"));
 app.use("/bootstrap", express.static("node_modules/bootstrap/dist"));
