@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "SET NODE_ENV=EVE && nodemon",
-    "DEV": "SET NODE_ENV=ADAM && nodemon",
+    "dev": "SET NODE_ENV=ADAM && nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

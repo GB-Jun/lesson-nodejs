@@ -4,12 +4,21 @@ const app = express();
 const multer = require("multer");
 // const upload = multer({ dest: "tmp-uploads" });
 const upload = require(__dirname + "/modules/upload-images");
+const session = require("express-session");
 
 app.set("view engine", "ejs");
 // 設定網址的大小寫是否有差異
 app.set("case sensitive routing", true);
 
 // ---------- Top-level middleware -----------------------------
+// session 的 secret是加密用的字串, 可以直接寫或是從別的地方引(像是env)
+app.use(
+    session({
+        saveUninitialized: false,
+        resave: false,
+        secret: "qobdxpziehpfqhqaaodmmvlshvnbdoxf",
+    })
+);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 // 做一個middleware但cb不結束他用next把資料繼續傳下去, 就會讓全部的都帶有中間插入的資訊, 或是處理過的資料
@@ -17,7 +26,6 @@ app.use((req, res, next) => {
     res.locals.topMiddleWare = "提前設定";
     next();
 });
-
 
 // ---------- route -----------------------------------------------
 app.get("/try-qs", (req, res) => {
@@ -80,6 +88,16 @@ const adminsRouter = require(__dirname + "/routes/admins");
 // prefix 路徑前綴
 app.use("/admins", adminsRouter);
 app.use(adminsRouter);
+
+// session 設定my_var來計算啟動
+app.get("/try-session", (req, res) => {
+    req.session.my_var = req.session.my_var || 0;
+    req.session.my_var++;
+    res.json({
+        my_var: req.session.my_var,
+        session: req.session,
+    });
+});
 
 app.get("/", (req, res) => {
     res.render("main", { name: "001" });
