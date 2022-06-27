@@ -9,12 +9,17 @@ app.set("view engine", "ejs");
 // 設定網址的大小寫是否有差異
 app.set("case sensitive routing", true);
 
-// ---------- Top-level middleware -----------
+// ---------- Top-level middleware -----------------------------
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+// 做一個middleware但cb不結束他用next把資料繼續傳下去, 就會讓全部的都帶有中間插入的資訊, 或是處理過的資料
+app.use((req, res, next) => {
+    res.locals.topMiddleWare = "提前設定";
+    next();
+});
 
-// ---------- route ---------------
 
+// ---------- route -----------------------------------------------
 app.get("/try-qs", (req, res) => {
     res.json(req.query);
 });
@@ -71,6 +76,7 @@ app.post("/post-uploadeds", upload.array("photos"), (req, res) => {
 
 // router的使用
 const adminsRouter = require(__dirname + "/routes/admins");
+// 這邊是把router當middleware使用
 // prefix 路徑前綴
 app.use("/admins", adminsRouter);
 app.use(adminsRouter);
@@ -79,11 +85,11 @@ app.get("/", (req, res) => {
     res.render("main", { name: "001" });
 });
 
-// ----------- static folder ------------
+// ----------- static folder --------------------------------------
 app.use(express.static("public"));
 app.use("/bootstrap", express.static("node_modules/bootstrap/dist"));
 
-// ----------- 404 -------------
+// ----------- 404 ------------------------------------------------
 app.use((req, res) => {
     res.send(`<h2>404 - Not Found 找不到頁面</h2>
     <img src="/imgs/404-error-page01.jpg" alt=""/>`);
