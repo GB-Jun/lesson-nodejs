@@ -6,6 +6,8 @@ const multer = require("multer");
 const upload = require(__dirname + "/modules/upload-images");
 
 app.set("view engine", "ejs");
+// 設定網址的大小寫是否有差異
+app.set("case sensitive routing", true);
 
 // ---------- Top-level middleware -----------
 app.use(express.urlencoded({ extended: false }));
@@ -67,6 +69,7 @@ app.post("/post-uploadeds", upload.array("photos"), (req, res) => {
     res.json(req.files);
 });
 
+// router的使用
 const adminsRouter = require(__dirname + "/routes/admins");
 // prefix 路徑前綴
 app.use("/admins", adminsRouter);
