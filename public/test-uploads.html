@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/fontawesome/css/all.css" />
         <title>test uploads</title>
         <style>
             .photo {
@@ -14,6 +15,14 @@
             .photo > img {
                 position: absolute;
                 width: 100%;
+            }
+            .photo > .fa-circle-minus {
+                position: absolute;
+                cursor: pointer;
+                right: 0;
+                top: 0;
+                font-size: 4vh;
+                color: red;
             }
         </style>
     </head>
@@ -34,6 +43,7 @@
             <!--             
             <div class="photo" data-f="">
                 <img src="/imgs/${filename}" alt="">
+                <i class="fa-solid fa-circle-minus" onclick="delItem(event)"></i>
             </div> 
             -->
         </div>
@@ -41,10 +51,16 @@
         <script>
             const $photos = document.form1.photos;
 
+            const delItem = (event) => {
+                const me = event.currentTarget;
+                me.closest(".photo").remove();
+            };
+
             const photoUnitFunc = ({ filename }) => {
                 return `            
                 <div class="photo" data-f="">
                 <img src="/imgs/${filename}" alt="">
+                <i class="fa-solid fa-circle-minus" onclick="delItem(event)"></i>
                 </div> 
                 `;
             };
@@ -58,9 +74,9 @@
                     .then((r) => r.json())
                     .then((data) => {
                         console.log(data);
-                        document.querySelector("#photos").innerHTML = data
+                        document.querySelector("#photos").innerHTML += data
                             .map((f) => photoUnitFunc(f))
-                            .join("");
+                            .join("");                        
                     });
             });
         </script>
