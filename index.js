@@ -12,12 +12,29 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // ---------- route ---------------
-app.get("/", (req, res) => {
-    res.render("main", { name: "001" });
-});
 
 app.get("/try-qs", (req, res) => {
     res.json(req.query);
+});
+
+app.get("/try-params1/:action/:id", (req, res) => {
+    res.json({ code: 2, params: req.params });
+});
+app.get("/try-params1/:action/", (req, res) => {
+    res.json({ code: 3, params: req.params });
+});
+app.get("/try-params1/:action?/:id?", (req, res) => {
+    res.json({ code: 1, params: req.params });
+});
+// app.get("/try-params1/*/*?", (req, res) => {
+//     res.json({ code: 0, params: req.params });
+// });
+
+app.get(/^\/Hi\/?/i, (req, res) => {
+    res.json({ code: "reg", url: req.url });
+});
+app.get(["/aaa", "/bbb"], (req, res) => {
+    res.json({ code: "array", url: req.url });
 });
 
 // middleware 中介軟體(function), 他有順序,在使用時如果要多個要用array
@@ -48,6 +65,15 @@ app.post("/post-uploaded", upload.single("avator"), (req, res) => {
 
 app.post("/post-uploadeds", upload.array("photos"), (req, res) => {
     res.json(req.files);
+});
+
+const adminsRouter = require(__dirname + "/routes/admins");
+// prefix 路徑前綴
+app.use("/admins", adminsRouter);
+app.use(adminsRouter);
+
+app.get("/", (req, res) => {
+    res.render("main", { name: "001" });
 });
 
 // ----------- static folder ------------

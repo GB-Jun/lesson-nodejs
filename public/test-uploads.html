@@ -15,6 +15,7 @@
             .photo > img {
                 position: absolute;
                 width: 100%;
+                height: 100px;
             }
             .photo > .fa-circle-minus {
                 position: absolute;
@@ -28,13 +29,7 @@
     </head>
     <body>
         <form name="form1" style="display: none">
-            <input
-                type="file"
-                name="photos"
-                id=""
-                multiple
-                accept="images/jpeg, images/png, images/gif"
-            />
+            <input type="file" name="photos" id="" multiple accept="images/*" />
         </form>
 
         <button onclick="document.form1.photos.click()">上傳檔案</button>
@@ -76,7 +71,7 @@
                         console.log(data);
                         document.querySelector("#photos").innerHTML += data
                             .map((f) => photoUnitFunc(f))
-                            .join("");                        
+                            .join("");
                     });
             });
         </script>
