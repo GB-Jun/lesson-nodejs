@@ -2,7 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const multer = require("multer");
-const upload = multer({ dest: "tmp-uploads" });
+// const upload = multer({ dest: "tmp-uploads" });
+const upload = require(__dirname + "/modules/upload-images");
 
 app.set("view engine", "ejs");
 
