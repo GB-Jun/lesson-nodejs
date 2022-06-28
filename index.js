@@ -5,6 +5,11 @@ const multer = require("multer");
 // const upload = multer({ dest: "tmp-uploads" });
 const upload = require(__dirname + "/modules/upload-images");
 const session = require("express-session");
+const moment = require("moment-timezone");
+
+const db = require(__dirname + "/modules/mysql-connect");
+const MysqlStore = require("express-mysql-session")(session);
+const sessionStore = new MysqlStore({}, db);
 
 app.set("view engine", "ejs");
 // 設定網址的大小寫是否有差異
@@ -17,6 +22,7 @@ app.use(
         saveUninitialized: false,
         resave: false,
         secret: "qobdxpziehpfqhqaaodmmvlshvnbdoxf",
+        store: sessionStore,
         cookie: {
             maxAge: 1800000, // 30 mins
             httpOnly: false, // 限制是否只能用http的擋頭寫入
@@ -62,7 +68,24 @@ app.get("/try-json", (req, res) => {
     const data = require(__dirname + "/data/data01");
     // 不用再用json parse 會直接幫忙轉換成array
     console.log(data);
-    res.json(data);
+    res.locals.rows = data;
+    res.render("try-json");
+});
+
+app.get("/try-moment", (req, res) => {
+    const fm = "YYYY-MM-DD HH:mm:ss";
+    const m1 = moment();
+    const m2 = moment("2022-02-29");
+    const m3 = moment("2022-02-28");
+
+    res.json({
+        m1: m1.format(fm),
+        m1a: m1.tz("Europe/London").format(fm),
+        m2: m2.format(fm),
+        m2a: m2.tz("Europe/London").format(fm),
+        m3: m3.format(fm),
+        m3a: m3.tz("Europe/London").format(fm),
+    });
 });
 
 // middleware 中介軟體(function), 他有順序,在使用時如果要多個要用array
