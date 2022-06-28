@@ -17,6 +17,12 @@ app.use(
         saveUninitialized: false,
         resave: false,
         secret: "qobdxpziehpfqhqaaodmmvlshvnbdoxf",
+        cookie: {
+            maxAge: 1800000, // 30 mins
+            httpOnly: false, // 限制是否只能用http的擋頭寫入
+            // domain: 現在domain不能設定第三方cookie了
+            // expires: expires和maxAge只會使用一個, 看誰是最後定義的來決定
+        },
     })
 );
 app.use(express.urlencoded({ extended: false }));
@@ -50,6 +56,13 @@ app.get(/^\/Hi\/?/i, (req, res) => {
 });
 app.get(["/aaa", "/bbb"], (req, res) => {
     res.json({ code: "array", url: req.url });
+});
+
+app.get("/try-json", (req, res) => {
+    const data = require(__dirname + "/data/data01");
+    // 不用再用json parse 會直接幫忙轉換成array
+    console.log(data);
+    res.json(data);
 });
 
 // middleware 中介軟體(function), 他有順序,在使用時如果要多個要用array
