@@ -24,7 +24,7 @@ app.use(
         secret: "qobdxpziehpfqhqaaodmmvlshvnbdoxf",
         store: sessionStore,
         cookie: {
-            maxAge: 1800000, // 30 mins
+            maxAge: 60000, // 1 mins
             httpOnly: false, // 限制是否只能用http的擋頭寫入
             // domain: 現在domain不能設定第三方cookie了
             // expires: expires和maxAge只會使用一個, 看誰是最後定義的來決定
@@ -134,6 +134,8 @@ app.get("/try-session", (req, res) => {
         session: req.session,
     });
 });
+
+app.use("/address-book", require(__dirname + "/routes/address-book"));
 
 app.get("/", (req, res) => {
     res.render("main", { name: "001" });
