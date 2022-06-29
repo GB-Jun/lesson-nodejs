@@ -10,6 +10,8 @@ const moment = require("moment-timezone");
 const db = require(__dirname + "/modules/mysql-connect");
 const MysqlStore = require("express-mysql-session")(session);
 const sessionStore = new MysqlStore({}, db);
+const { toDateString, toDateTimeString } = require(__dirname +
+    "/modules/date-tools");
 
 app.set("view engine", "ejs");
 // 設定網址的大小寫是否有差異
@@ -36,6 +38,10 @@ app.use(express.json());
 // 做一個middleware但cb不結束他用next把資料繼續傳下去, 就會讓全部的都帶有中間插入的資訊, 或是處理過的資料
 app.use((req, res, next) => {
     res.locals.topMiddleWare = "提前設定";
+
+    // template helper functions
+    res.locals.toDateString = toDateString;
+    res.locals.toDateTimeString = toDateTimeString;
     next();
 });
 
