@@ -4,6 +4,7 @@ const db = require(__dirname + "/../modules/mysql-connect-mfee26");
 const { toDateString, toDateTimeString } = require(__dirname +
     "/../modules/date-tools");
 const moment = require('moment-timezone');
+const uploads = require(__dirname + '/../modules/upload-images')
 
 const getListHandler = async (req, res) => {
     let output = {
@@ -87,6 +88,16 @@ const getListHandler = async (req, res) => {
 
     return output;
 };
+
+
+
+router.get("/add", async (req, res) => {
+    res.render("address-book/add");
+});
+router.post("/add", uploads.none() , async (req, res) => {
+    res.json(req.body);
+});
+
 
 router.get("/", async (req, res) => {
     const output = await getListHandler(req, res);
