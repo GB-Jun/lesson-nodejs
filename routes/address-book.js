@@ -3,8 +3,9 @@ const router = express.Router(); // 建立route物件
 const db = require(__dirname + "/../modules/mysql-connect-mfee26");
 const { toDateString, toDateTimeString } = require(__dirname +
     "/../modules/date-tools");
-const moment = require('moment-timezone');
-const uploads = require(__dirname + '/../modules/upload-images')
+const moment = require("moment-timezone");
+const Joi = require("joi");
+const uploads = require(__dirname + "/../modules/upload-images");
 
 const getListHandler = async (req, res) => {
     let output = {
@@ -16,8 +17,8 @@ const getListHandler = async (req, res) => {
         error: "",
         query: {},
         rows: [],
-        search: '',
-        showTest: '',
+        search: "",
+        showTest: "",
     };
     let page = +req.query.page || 1;
 
@@ -32,22 +33,19 @@ const getListHandler = async (req, res) => {
     }
     if (beginDate) {
         const mo = moment(beginDate);
-        if (mo.isValid()) {            
-        where += ` AND birthday >= '${mo.format('YYYY-MM-DD')}'  `; 
-        output.query.beginDate = mo.format('YYYY-MM-DD');
+        if (mo.isValid()) {
+            where += ` AND birthday >= '${mo.format("YYYY-MM-DD")}'  `;
+            output.query.beginDate = mo.format("YYYY-MM-DD");
         }
     }
     if (endDate) {
         const mo = moment(endDate);
-        if (mo.isValid()) {            
-        where += ` AND birthday <= '${mo.format('YYYY-MM-DD')}'  `; 
-        output.query.endDate = mo.format('YYYY-MM-DD');
+        if (mo.isValid()) {
+            where += ` AND birthday <= '${mo.format("YYYY-MM-DD")}'  `;
+            output.query.endDate = mo.format("YYYY-MM-DD");
         }
-    }    
+    }
     output.showTest = where; // 用於檢查篩選的結果, 可以在api查看資訊來除錯
-
-
-
 
     if (page < 1) {
         output.code = 410;
@@ -89,15 +87,20 @@ const getListHandler = async (req, res) => {
     return output;
 };
 
-
-
 router.get("/add", async (req, res) => {
     res.render("address-book/add");
 });
-router.post("/add", uploads.none() , async (req, res) => {
-    res.json(req.body);
-});
+router.post("/add", uploads.none(), async (req, res) => {
+    const schema = Joi.object({
+        name: Joi.string().min(3).max(30).required().label("姓名必填"),
+        email: Joi.string().email().required(),
+        mobile: Joi.string(),
+        birthday: Joi.string().min(0),
+        address: Joi.string(),
+    });
 
+    res.json(schema.validate(req.body, { abortEarly: false }));
+});
 
 router.get("/", async (req, res) => {
     const output = await getListHandler(req, res);

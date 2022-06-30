@@ -78,7 +78,34 @@
 
         const usp = new URLSearchParams(fd);
         console.log(usp.toString());
-        
+
+
+        // 用JSON傳送資料, 如果資料量少會適合JSON, 要注意Content-Type的設定
+        // fetch("", {
+        //     method: "POST",
+        //     body: JSON.stringify(dataObj),
+        //     headers: {
+        //         "Content-Type": application/json,
+        //     },
+        // })
+        //     .then((r) => r.json())
+        //     .then((obj) => {
+        //         console.log(obj);
+        //     });
+
+
+        // 用urlencoded 傳送資料, 最簡單的用法new FormData再new URLSearchParams就能用, 要注意Content-Type的設定
+        // fetch("", {
+        //     method: "POST",
+        //     body: usp.toString(),
+        //     headers:{
+        //         'Content-Type' : application/x-www-form-urlencoded
+        //     }
+        // })
+        //     .then((r) => r.json())
+        //     .then((obj) => {
+        //         console.log(obj);
+        //     });
 
         fetch("", {
             method: "POST",
