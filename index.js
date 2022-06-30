@@ -6,6 +6,7 @@ const multer = require("multer");
 const upload = require(__dirname + "/modules/upload-images");
 const session = require("express-session");
 const moment = require("moment-timezone");
+const axios = require("axios");
 
 const db = require(__dirname + "/modules/mysql-connect");
 const MysqlStore = require("express-mysql-session")(session);
@@ -142,6 +143,22 @@ app.get("/try-session", (req, res) => {
 });
 
 app.use("/address-book", require(__dirname + "/routes/address-book"));
+
+
+
+// 從後端直接爬資料
+app.get('/yahoo', async (req, res)=>{
+    axios.get('https://tw.yahoo.com/')
+    .then(function (response) {
+      // handle success
+        console.log(response);
+        res.send(response.data);
+    })
+});
+
+
+
+
 
 app.get("/", (req, res) => {
     res.render("main", { name: "001" });

@@ -91,15 +91,31 @@ router.get("/add", async (req, res) => {
     res.render("address-book/add");
 });
 router.post("/add", uploads.none(), async (req, res) => {
-    const schema = Joi.object({
-        name: Joi.string().min(3).max(30).required().label("姓名必填"),
-        email: Joi.string().email().required(),
-        mobile: Joi.string(),
-        birthday: Joi.string().min(0),
-        address: Joi.string(),
-    });
+    // const schema = Joi.object({
+    //     name: Joi.string().min(3).max(30).required().label("姓名必填"),
+    //     email: Joi.string().email().required(),
+    //     mobile: Joi.string(),
+    //     birthday: Joi.any(),
+    //     // any 後面還可以設定optional()
+    //     address: Joi.string(),
+    // });
 
-    res.json(schema.validate(req.body, { abortEarly: false }));
+    console.log(schema.validate(req.body, { abortEarly: false }));
+
+    // const sql =
+    //     "INSERT INTO `address_book`(`name`, `email`, `mobile`, `birthday`, `address`, `created_at`) VALUES (?,?,?,?,?, NOW())";
+    // const { name, email, mobile, birthday, address } = req.body;
+    // const [result] = await db.query(sql, [
+    //     name,
+    //     email,
+    //     mobile,
+    //     birthday,
+    //     address,
+    // ]);
+
+    const sql = "INSERT INTO `address_book` SET ?";
+    const inserData = { ...req.body, created_at: new Date() };
+    const [result] = await db.query(sql, [inserData]);
 });
 
 router.get("/", async (req, res) => {
