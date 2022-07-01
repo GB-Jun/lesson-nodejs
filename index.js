@@ -158,6 +158,7 @@ app.get("/try-session", (req, res) => {
 });
 
 app.use("/address-book", require(__dirname + "/routes/address-book"));
+app.use("/carts", require(__dirname + "/routes/carts"));
 
 // 從後端直接爬資料
 app.get("/yahoo", async (req, res) => {
