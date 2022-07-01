@@ -15,11 +15,23 @@ const sessionStore = new MysqlStore({}, db);
 const { toDateString, toDateTimeString } = require(__dirname +
     "/modules/date-tools");
 
+const cors = require("cors");
+
 app.set("view engine", "ejs");
 // 設定網址的大小寫是否有差異
 app.set("case sensitive routing", true);
 
 // ---------- Top-level middleware -----------------------------
+// cors設定
+const corsOptions = {
+    credential: true,
+    origin: (origin, cb) => {
+        console.log({ origin });
+        cb(null, true);
+    },
+};
+app.use(cors(corsOptions));
+
 // session 的 secret是加密用的字串, 可以直接寫或是從別的地方引(像是env)
 app.use(
     session({

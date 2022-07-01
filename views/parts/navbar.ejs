@@ -30,9 +30,11 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/address-book">列表</a>
                         </li>
+                        <% if (session.admin && session.admin.account){%>
                         <li class="nav-item">
                             <a class="nav-link" href="/address-book/add">新增</a>
                         </li>
+                        <% } %>
                         <li class="nav-item">
                             <a class="nav-link" href="/edit"
                                 >修改</a
