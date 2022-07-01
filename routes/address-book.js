@@ -87,10 +87,30 @@ const getListHandler = async (req, res) => {
     return output;
 };
 
+router.use((req, res, next) => {
+    // 直接用top-level來擋沒有登入管理者
+    /*
+    if(! req.session.admin){
+        return res.redirect('/');
+    }
+    */
+
+    next();
+});
+
+
+
 router.get("/add", async (req, res) => {
+    if(! req.session.admin){
+        return res.redirect('/');
+    }
     res.render("address-book/add");
 });
 router.post("/add", uploads.none(), async (req, res) => {
+    if(! req.session.admin){
+        return res.json({ success: false, error: '請先登入' });
+        // 要記得post也要擋
+    }
     // const schema = Joi.object({
     //     name: Joi.string().min(3).max(30).required().label("姓名必填"),
     //     email: Joi.string().email().required(),
@@ -128,7 +148,13 @@ router.get("/", async (req, res) => {
             return res.redirect(`?page=${output.totalPages}`);
             break;
     }
-    res.render("address-book/main", output);
+    // 在不同的權限(有沒有登入) 能看到的東西不一樣
+    if (!req.session.admin) {
+        res.render('address-book/main-noadmin', output);
+    } else {
+        res.render('address-book/main', output);
+    }
+
 });
 router.get("/api", async (req, res) => {
     const output = await getListHandler(req, res);
