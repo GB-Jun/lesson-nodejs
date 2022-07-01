@@ -7,8 +7,9 @@ const upload = require(__dirname + "/modules/upload-images");
 const session = require("express-session");
 const moment = require("moment-timezone");
 const axios = require("axios");
+const bcrypt = require("bcryptjs");
 
-const db = require(__dirname + "/modules/mysql-connect");
+const db = require(__dirname + "/modules/mysql-connect-mfee26");
 const MysqlStore = require("express-mysql-session")(session);
 const sessionStore = new MysqlStore({}, db);
 const { toDateString, toDateTimeString } = require(__dirname +
@@ -43,6 +44,8 @@ app.use((req, res, next) => {
     // template helper functions
     res.locals.toDateString = toDateString;
     res.locals.toDateTimeString = toDateTimeString;
+    res.locals.session = req.session;
+
     next();
 });
 
@@ -144,21 +147,57 @@ app.get("/try-session", (req, res) => {
 
 app.use("/address-book", require(__dirname + "/routes/address-book"));
 
-
-
 // 從後端直接爬資料
-app.get('/yahoo', async (req, res)=>{
-    axios.get('https://tw.yahoo.com/')
-    .then(function (response) {
-      // handle success
+app.get("/yahoo", async (req, res) => {
+    axios.get("https://tw.yahoo.com/").then(function (response) {
+        // handle success
         console.log(response);
         res.send(response.data);
-    })
+    });
 });
 
+app.get("/logout", (req, res) => {
+    delete req.session.admin;
+    res.redirect("/");
+});
 
+app.route("/login")
+    .get(async (req, res) => {
+        res.render("login");
+    })
+    .post(async (req, res) => {
+        const output = {
+            success: false,
+            error: "",
+            code: 0,
+        };
 
+        const sql = "SELECT * FROM admins WHERE account=?";
+        const [result01] = await db.query(sql, [req.body.account]);
 
+        if (!result01.length) {
+            // 帳號錯誤
+            output.code = 401;
+            output.error = "帳密錯誤";
+            return res.json(output);
+        }
+
+        const row = result01[0];
+
+        output.success = await bcrypt.compare(req.body.password, row.pass_hash);
+
+        if (!output.success) {
+            output.code = 402;
+            output.error = "帳密錯誤";
+        } else {
+            req.session.admin = {
+                sid: row.sid,
+                account: row.account,
+            };
+        }
+
+        res.json(output);
+    });
 
 app.get("/", (req, res) => {
     res.render("main", { name: "001" });
