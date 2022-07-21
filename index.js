@@ -193,8 +193,8 @@ app.route("/login-jwt")
             code: 0,
             data: {},
         };
-        const sql = "SELECT * FROM admins WHERE admin_account=?";
-        const [r1] = await db.query(sql, [req.body.admin_account]);
+        const sql = "SELECT * FROM admin WHERE account=?";
+        const [r1] = await db.query(sql, [req.body.account]);
 
         if (!r1.length) {
             // 帳號錯誤
@@ -205,7 +205,7 @@ app.route("/login-jwt")
         //const row = r1[0];
 
         output.success = await bcrypt.compare(
-            req.body.admin_password,
+            req.body.password,
             r1[0].pass_hash
         );
         if (!output.success) {
@@ -217,14 +217,15 @@ app.route("/login-jwt")
             const token = jwt.sign(
                 {
                     sid: r1[0].sid,
-                    admin_account: r1[0].admin_account,
+                    account: r1[0].account,
                 },
                 process.env.JWT_SECRET
             );
 
             output.data = {
+                sid: r1[0].sid,
                 token,
-                admin_account: r1[0].admin_account,
+                account: r1[0].account,
             };
         }
 
@@ -232,7 +233,7 @@ app.route("/login-jwt")
     });
 
 app.route("/login")
-// app.route("/login-jwt")
+    // app.route("/login-jwt")
     .get(async (req, res) => {
         res.render("login");
         // res.render("login-jwt");
@@ -256,7 +257,10 @@ app.route("/login")
 
         // const row = result01[0];
 
-        output.success = await bcrypt.compare(req.body.admin_password, row.pass_hash);
+        output.success = await bcrypt.compare(
+            req.body.admin_password,
+            row.pass_hash
+        );
 
         if (!output.success) {
             output.code = 402;
