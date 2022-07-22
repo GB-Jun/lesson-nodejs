@@ -58,6 +58,13 @@ app.use((req, res, next) => {
     res.locals.toDateTimeString = toDateTimeString;
     res.locals.session = req.session;
 
+    const auth = req.get("Authorization");
+    res.locals.loginUser = null;
+    if (auth && auth.indexOf("Bearer ") === 0) {
+        const token = auth.slice(7);
+        res.locals.loginUser = jwt.verify(token, process.env.JWT_SECRET);
+    }
+
     next();
 });
 

@@ -98,17 +98,15 @@ router.use((req, res, next) => {
     next();
 });
 
-
-
 router.get("/add", async (req, res) => {
-    if(! req.session.admin){
-        return res.redirect('/');
+    if (!req.session.admin) {
+        return res.redirect("/");
     }
     res.render("address-book/add");
 });
 router.post("/add", uploads.none(), async (req, res) => {
-    if(! req.session.admin){
-        return res.json({ success: false, error: '請先登入' });
+    if (!req.session.admin) {
+        return res.json({ success: false, error: "請先登入" });
         // 要記得post也要擋
     }
     // const schema = Joi.object({
@@ -150,15 +148,31 @@ router.get("/", async (req, res) => {
     }
     // 在不同的權限(有沒有登入) 能看到的東西不一樣
     if (!req.session.admin) {
-        res.render('address-book/main-noadmin', output);
+        res.render("address-book/main-noadmin", output);
     } else {
-        res.render('address-book/main', output);
+        res.render("address-book/main", output);
     }
-
 });
 router.get("/api", async (req, res) => {
     const output = await getListHandler(req, res);
     res.json(output);
 });
 
+
+// 有 token 才給過
+router.get('/api-auth', async (req, res)=>{
+    let output = {
+        success: false,
+        error: ''
+    };
+
+    if(res.locals.loginUser && res.locals.loginUser.account){
+        output = {...(await getListHandler(req, res)), success: true};
+
+    } else {
+        output.error = '沒有授權';
+    }
+    output.loginUser = res.locals.loginUser;
+    res.json(output);
+});
 module.exports = router;
