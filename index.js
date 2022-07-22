@@ -8,6 +8,7 @@ const session = require("express-session");
 const moment = require("moment-timezone");
 const axios = require("axios");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const db = require(__dirname + "/modules/mysql-connect-mfee26");
 const MysqlStore = require("express-mysql-session")(session);
@@ -59,10 +60,17 @@ app.use((req, res, next) => {
     res.locals.session = req.session;
 
     const auth = req.get("Authorization");
+<<<<<<< HEAD
     res.locals.loginUser = null;
     if (auth && auth.indexOf("Bearer ") === 0) {
         const token = auth.slice(7);
         res.locals.loginUser = jwt.verify(token, process.env.JWT_SECRET);
+=======
+    res.locals.payload = null;
+    if (auth && auth.indexOf("Bearer ") === 0) {
+        const token = auth.slice(7);
+        res.locals.payload = jwt.verify(token, process.env.JWT_SECRET);
+>>>>>>> 025cb3d3a32c89a518bf0f06b2f19d330c44a0db
     }
 
     next();
@@ -133,9 +141,9 @@ app.route("/try-post-form")
         res.render("try-post-form");
     })
     .post((req, res) => {
-        // 從用戶寄來的資料裡的body拿email, password展開設定, 然後在render時放回資料
-        const { email, password } = req.body;
-        res.render("try-post-form", { email, password });
+        // 從用戶寄來的資料裡的body拿email, admin_password展開設定, 然後在render時放回資料
+        const { email, admin_password } = req.body;
+        res.render("try-post-form", { email, admin_password });
     });
 
 // single:單一檔案, array:一個input多個檔案, fields: 多個input多個檔案, none:不上傳檔案
@@ -181,9 +189,61 @@ app.get("/logout", (req, res) => {
     res.redirect("/");
 });
 
+app.route("/login-jwt")
+    .get(async (req, res) => {
+        res.render("login-jwt");
+    })
+    .post(async (req, res) => {
+        const output = {
+            success: false,
+            error: "",
+            code: 0,
+            data: {},
+        };
+        const sql = "SELECT * FROM admin WHERE account=?";
+        const [r1] = await db.query(sql, [req.body.account]);
+
+        if (!r1.length) {
+            // 帳號錯誤
+            output.code = 401;
+            output.error = "帳密錯誤";
+            return res.json(output);
+        }
+        //const row = r1[0];
+
+        output.success = await bcrypt.compare(
+            req.body.password,
+            r1[0].pass_hash
+        );
+        if (!output.success) {
+            // 密碼錯誤
+            output.code = 402;
+            output.error = "帳密錯誤";
+        } else {
+            // 成功登入
+            const token = jwt.sign(
+                {
+                    sid: r1[0].sid,
+                    account: r1[0].account,
+                },
+                process.env.JWT_SECRET
+            );
+
+            output.data = {
+                sid: r1[0].sid,
+                token,
+                account: r1[0].account,
+            };
+        }
+
+        res.json(output);
+    });
+
 app.route("/login")
+    // app.route("/login-jwt")
     .get(async (req, res) => {
         res.render("login");
+        // res.render("login-jwt");
     })
     .post(async (req, res) => {
         const output = {
@@ -192,8 +252,8 @@ app.route("/login")
             code: 0,
         };
 
-        const sql = "SELECT * FROM admins WHERE account=?";
-        const [result01] = await db.query(sql, [req.body.account]);
+        const sql = "SELECT * FROM admins WHERE admin_account=?";
+        const [result01] = await db.query(sql, [req.body.admin_account]);
 
         if (!result01.length) {
             // 帳號錯誤
@@ -202,18 +262,29 @@ app.route("/login")
             return res.json(output);
         }
 
-        const row = result01[0];
+        // const row = result01[0];
 
-        output.success = await bcrypt.compare(req.body.password, row.pass_hash);
+        output.success = await bcrypt.compare(
+            req.body.admin_password,
+            row.pass_hash
+        );
 
         if (!output.success) {
             output.code = 402;
             output.error = "帳密錯誤";
         } else {
-            req.session.admin = {
-                sid: row.sid,
-                account: row.account,
-            };
+            // 成功登入
+            const token = jwt.sign(
+                {
+                    admin_sid: r1[0].admin_sid,
+                    admin_account: r1[0].admin_account,
+                },
+                process.env.JWT_SECRET
+            );
+            // req.session.admin = {
+            //     sid: row.sid,
+            //     admin_account: row.admin_account,
+            // };
         }
 
         res.json(output);
